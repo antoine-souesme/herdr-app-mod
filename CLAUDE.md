@@ -31,6 +31,10 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
 - Ne modifie jamais un mod ou une disposition fournis par Herdr : ils sont
   écrasés à chaque démarrage. Duplique-les (`mod.clone`, `layout.clone`) avec
   un nom `antoine-…`. Les clés de l'état partagé commencent par `antoine.`.
+- Tout ce qui est repris de Herdr (copie de mod, de disposition, de thème, ou
+  code recopié) est décrit dans `.claude/skills/syncing-herdr-copies/COPIES.md`,
+  avec chaque ajout d'Antoine. Un ajout ou un retrait dans une copie met ce
+  registre à jour dans le même changement.
 - Garde les règles dans des modules purs et teste-les ici : `tests/`, lancés
   avec `node --test tests/*.test.mjs`. Les tests restent hors de `~/.config/herdr-app`,
   pour ne pas recharger le mod à chaque sauvegarde.
@@ -44,3 +48,5 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
 
 - `docs/superpowers/specs/` : documents de conception ; `docs/superpowers/plans/` : plans.
 - `tests/` : tests des modules purs du mod `antoine`.
+- `upstream/` : les originaux de Herdr tels qu'au dernier report dans les copies.
+  Après une mise à jour de Herdr, skill `syncing-herdr-copies`.

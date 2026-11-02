@@ -137,3 +137,33 @@ test("iconFor picks the material icon like VS Code", () => {
   assert.equal(I.iconFor(MAP, "misc", true, false), "folder");
   assert.equal(I.iconFor(MAP, "misc", true, true), "folder-open");
 });
+
+test("addFolder adds a folder to one workspace only, once", () => {
+  let st = F.addFolder(null, "w1", "/x");
+  st = F.addFolder(st, "w1", "/x");
+  st = F.addFolder(st, "w2", "/y");
+  assert.deepEqual(F.foldersOf(st, "w1"), ["/x"]);
+  assert.deepEqual(F.foldersOf(st, "w2"), ["/y"]);
+  assert.deepEqual(F.foldersOf(st, "w3"), []);
+});
+
+test("removeFolder takes the folder out of its workspace", () => {
+  const st = F.addFolder(F.addFolder(null, "w1", "/x"), "w1", "/z");
+  const before = frozen(st);
+  assert.deepEqual(F.foldersOf(F.removeFolder(st, "w1", "/x"), "w1"), ["/z"]);
+  assert.deepEqual(st, before);
+});
+
+test("withFolders puts the added folders after the spaces' ones, without duplicates", () => {
+  assert.deepEqual(F.withFolders(["/a", "/b"], ["/c", "/a"]), ["/a", "/b", "/c"]);
+});
+
+test("moveFolder reorders a workspace's added folders", () => {
+  let st = null;
+  for (const p of ["/a", "/b", "/c"]) st = F.addFolder(st, "w1", p);
+  const before = frozen(st);
+  assert.deepEqual(F.foldersOf(F.moveFolder(st, "w1", 0, 2), "w1"), ["/b", "/c", "/a"]);
+  assert.deepEqual(F.foldersOf(F.moveFolder(st, "w1", 2, 0), "w1"), ["/c", "/a", "/b"]);
+  assert.deepEqual(F.foldersOf(F.moveFolder(st, "w1", 1, 1), "w1"), ["/a", "/b", "/c"]);
+  assert.deepEqual(st, before);
+});
