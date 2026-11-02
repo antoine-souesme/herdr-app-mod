@@ -1,5 +1,5 @@
 ---
-name: syncing-herdr-copies
+name: sync
 description: Use when Herdr (herdr-app) was updated, when Antoine asks whether his copied mods, layout, theme or keys are behind Herdr's, or before changing anything copied from Herdr (antoine-agents, antoine-spaces, tabbar.js, layouts/antoine.json, antoine-monokai) after a Herdr update.
 ---
 
@@ -20,11 +20,11 @@ originaux, jamais les copies. Trois choses rendent le report sûr :
 ## Étapes
 
 1. Lis `COPIES.md` en entier.
-2. `bash .claude/skills/syncing-herdr-copies/upstream.sh diff` depuis la racine du dépôt.
+2. `bash .claude/skills/sync/upstream.sh diff` depuis la racine du dépôt.
    La première ligne donne la version du dernier report et la version installée.
    - Même version et sortie 0 : rien à faire, dis-le à Antoine avec la version.
    - Sortie 1 : le diff montre chaque changement de Herdr.
-3. `bash .claude/skills/syncing-herdr-copies/upstream.sh check` : une icône de Herdr
+3. `bash .claude/skills/sync/upstream.sh check` : une icône de Herdr
    disparue est à remplacer dans le mod `antoine` (cherche son nouveau nom chez Herdr).
 4. Pour chaque bloc du diff, trouve la copie dans `COPIES.md` et reporte le changement
    à la main dans la copie :
@@ -36,7 +36,7 @@ originaux, jamais les copies. Trois choses rendent le report sûr :
    `herdr-app status` (aucune erreur), `herdr-app shot` pour regarder, et
    `node --test tests/*.test.mjs` si un module pur a bougé.
 6. Vérifie aussi `keys.json` : la section `layout:antoine` doit toujours y être.
-7. Tout reporté et vérifié : `bash .claude/skills/syncing-herdr-copies/upstream.sh snapshot`
+7. Tout reporté et vérifié : `bash .claude/skills/sync/upstream.sh snapshot`
    (met `upstream/VERSION` à la version installée). Mets `COPIES.md` à jour si un
    ajout a changé de forme. Commit avec un message qui nomme la version de Herdr.
 8. Compte rendu à Antoine : version d'avant et d'après, ce qui a été reporté, ce qui
