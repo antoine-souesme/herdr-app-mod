@@ -19,6 +19,12 @@ Ajouts d'Antoine :
   workspace ne tient encore. Lit l'état partagé `antoine.workspaces`.
 - **Menu de tri** : `openOverlay({ mod: "antoine-agents", … sortMenu })` au lieu de
   `mod: "agents"`, pour que le menu s'ouvre dans la copie.
+- **Nom du space sur chaque ligne** (`row`, `const full = true`) : une ligne
+  d'agent dit toujours « space · détail », même sous un en-tête de space
+  (l'original ne le fait qu'en tri par priorité et pour les épinglés).
+- **Tri « Ordre des spaces »** (`SORTS`, `id: "spaces"`) : une seule liste sans
+  en-têtes, triée par l'ordre de `spaces()` (dans `render` avant le tri par
+  priorité, et `rows`) ; menu de tri passé de 140 à 175 px de haut.
 - **Sous-agents internes de Claude Code** (repris de herdr-paddock, Apache-2.0, sans
   Codex) : `hooks/subagents.sh`, branché dans `~/.claude/settings.json` (SubagentStart,
   SubagentStop, StopFailure, SessionStart, SessionEnd, en `async`), pose une étiquette
@@ -44,6 +50,9 @@ Ajouts d'Antoine :
   de terminaux ; quand un fichier est affiché, aucun onglet de terminal n'a l'air
   actif ni sa croix ; cliquer un onglet de terminal revient aux terminaux
   (`this.files.toTerminals()`).
+- **Dépôt de fichiers du Finder** : `.on_drop` sur la racine de la barre appelle
+  `dropFiles`, qui garde les fichiers (pas les dossiers) et les ouvre comme
+  l'explorateur (`openFiles` de `files.js`, le dernier est affiché).
 - Plus de `export default class … extends View` : `export class TabBar` avec
   `constructor(_props, cx)`.
 - Icônes de fenêtre Windows lues dans `mods/antoine/win-*.svg` (copies identiques).

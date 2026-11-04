@@ -167,3 +167,27 @@ test("moveFolder reorders a workspace's added folders", () => {
   assert.deepEqual(F.foldersOf(F.moveFolder(st, "w1", 1, 1), "w1"), ["/a", "/b", "/c"]);
   assert.deepEqual(st, before);
 });
+
+test("staleDirs gives the shown folders holding a changed path", () => {
+  const shown = ["/r", "/r/src", "/r/docs"];
+  assert.deepEqual(F.staleDirs(["/r/src/a.js", "/r/new.md"], shown).sort(), ["/r", "/r/src"]);
+});
+
+test("staleDirs skips changes inside .git and in folders not shown", () => {
+  assert.deepEqual(F.staleDirs(["/r/.git/index", "/r/.git/objects/ab/cd", "/r/lib/x.js"], ["/r", "/r/src"]), []);
+});
+
+test("staleDirs reloads the parent when a folder itself changes", () => {
+  assert.deepEqual(F.staleDirs(["/r/src"], ["/r", "/r/src"]).sort(), ["/r", "/r/src"]);
+});
+
+test("openFiles opens each dropped file and shows the last", () => {
+  const st = F.openFiles(F.pin(null, "w1", "/p.md"), "w1", ["/a.md", "/p.md", "/b.md"]);
+  assert.deepEqual(F.tabsOf(st, "w1").map((t) => t.path), ["/p.md", "/a.md", "/b.md"]);
+  assert.equal(F.shownOf(st, "w1"), "/b.md");
+});
+
+test("openFiles with no file changes nothing", () => {
+  const st = F.openFile(null, "w1", "/a.md");
+  assert.equal(F.openFiles(st, "w1", []), st);
+});
