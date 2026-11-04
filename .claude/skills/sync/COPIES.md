@@ -19,6 +19,12 @@ Ajouts d'Antoine :
   workspace ne tient encore. Lit l'état partagé `antoine.workspaces`.
 - **Menu de tri** : `openOverlay({ mod: "antoine-agents", … sortMenu })` au lieu de
   `mod: "agents"`, pour que le menu s'ouvre dans la copie.
+- **Sous-agents internes de Claude Code** (repris de herdr-paddock, Apache-2.0, sans
+  Codex) : `hooks/subagents.sh`, branché dans `~/.claude/settings.json` (SubagentStart,
+  SubagentStop, StopFailure, SessionStart, SessionEnd, en `async`), pose une étiquette
+  `antoine.sub.<id>` sur le terminal de l'agent. `subs.js` (pur, testé) la lit ; dans
+  `main.js`, méthodes `subs`, `subStatus`, `hookRow`, `this.hooked` dans `render`, et
+  `subRow`, `withKids`, `fold`, `urgency` passent par `subs` au lieu de `tree`.
 - `mod.json` : `cloned_from` (laissé par `mod.clone`).
 
 ## 2. `mods/antoine-spaces/` ← `mods/spaces/`
