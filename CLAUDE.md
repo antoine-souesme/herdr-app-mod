@@ -19,6 +19,8 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
   - `files.js` : règles pures des onglets de fichiers ; `filestore.js` : état
     partagé `antoine.files` ; `icons.js` + `material.js` + `icons/material/` :
     icônes du thème Material Icon de VS Code (MIT).
+  - `quickopen.js` : règles pures de la recherche de fichiers (`cmd-p`) et des
+    fichiers récents (état partagé `antoine.recent`) ; `quickopenview.js` : sa fenêtre.
   - Herdr refuse qu'un mod importe un fichier d'un autre mod : tout ce qui
     partage du code reste dans `antoine`.
 - `~/.config/herdr-app/mods/antoine-spaces/` et `antoine-agents/` : copies

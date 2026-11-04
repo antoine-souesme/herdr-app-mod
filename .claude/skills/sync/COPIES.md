@@ -31,6 +31,10 @@ Ajouts d'Antoine :
   `antoine.sub.<id>` sur le terminal de l'agent. `subs.js` (pur, testé) la lit ; dans
   `main.js`, méthodes `subs`, `subStatus`, `hookRow`, `this.hooked` dans `render`, et
   `subRow`, `withKids`, `fold`, `urgency` passent par `subs` au lieu de `tree`.
+- **Retour aux terminaux au clic sur un agent** (`focusAgent`, avant `clean`) :
+  les trois `run("pane.focus", …)` des lignes d'agent et de sous-agent passent par
+  `focusAgent`, qui remet `shown` à `null` dans `antoine.files` pour le workspace
+  ouvert, puis donne le focus au terminal de l'agent.
 - `mod.json` : `cloned_from` (laissé par `mod.clone`).
 
 ## 2. `mods/antoine-spaces/` ← `mods/spaces/`
@@ -50,9 +54,13 @@ Ajouts d'Antoine :
   de terminaux ; quand un fichier est affiché, aucun onglet de terminal n'a l'air
   actif ni sa croix ; cliquer un onglet de terminal revient aux terminaux
   (`this.files.toTerminals()`).
+- **Croix des onglets de terminaux** : présente sur chaque onglet, mais invisible
+  et sans effet hors de l'onglet actif, pour que changer d'onglet ne décale pas
+  les autres (Herdr ne l'ajoute qu'à l'onglet actif).
 - **Dépôt de fichiers du Finder** : `.on_drop` sur la racine de la barre appelle
   `dropFiles`, qui garde les fichiers (pas les dossiers) et les ouvre comme
-  l'explorateur (`openFiles` de `files.js`, le dernier est affiché).
+  l'explorateur (`openFiles` de `files.js`, le dernier est affiché) ; tous
+  entrent dans les fichiers récents de `cmd-p` (`rememberAll` de `filestore.js`).
 - Plus de `export default class … extends View` : `export class TabBar` avec
   `constructor(_props, cx)`.
 - Icônes de fenêtre Windows lues dans `mods/antoine/win-*.svg` (copies identiques).
@@ -82,10 +90,13 @@ Tout le reste suit `monokai`.
 - `mods/antoine/spinner.svg` ← `mods/workspace-chrome/spinner.svg` (copie identique).
 - `mods/antoine/explorer.js`, classe `ExplorerTrash` : écrite sur le modèle de
   `mods/confirm/main.js` (mêmes touches Entrée / Échap, même allure), textes en français.
+- `mods/antoine/quickopenview.js` (recherche de fichiers, `cmd-p`) : défilement à la
+  molette et suivi de la sélection repris de `mods/picker/main.js`, liste à hauteur de ligne fixe.
 
 ## 7. Raccourcis : `keys.json`, section `layout:antoine`
 
-`cmd-s` → `antoine.save`, `cmd-w` → `antoine.close`. Le reste du fichier est celui de
+`cmd-s` → `antoine.save`, `cmd-w` → `antoine.close`, `cmd-p` → `antoine.quickopen`
+(remplace, dans cette disposition, le `cmd-p` de Herdr qui ouvre `picker`). Le reste du fichier est celui de
 Herdr ; vérifier après une mise à jour que la section `layout:antoine` est toujours là.
 
 ## 8. Fichiers de Herdr utilisés tels quels (à vérifier qu'ils existent encore)
