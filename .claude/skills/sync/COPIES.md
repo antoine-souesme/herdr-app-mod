@@ -41,7 +41,9 @@ Ajouts d'Antoine :
 
 Ajouts d'Antoine :
 - **Filtre par workspace** : fonction `visibleIds(ids)` (même règle que
-  `visibleSpaceIds` dans `mods/antoine/workspaces.js`), appliquée dans `ordered()`.
+  `visibleSpaceIds` dans `mods/antoine/workspaces.js`), appliquée dans `ordered()`
+  au filtre final seulement : le rangement des worktrees (`space.move`, Herdr 0.1.13)
+  se calcule sur tous les spaces, pour ne pas déplacer ceux des autres workspaces.
 - **Workspace vide** : quand aucun space n'est visible, un bloc « Aucun space » avec
   un bouton « Nouveau space » (`run("space.new")`) au lieu d'une liste vide.
 - `mod.json` : `cloned_from`.
