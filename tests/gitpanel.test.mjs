@@ -326,3 +326,37 @@ test("f sur une branche : récupère ses commits distants sans passer dessus", (
   assert.equal(P.refusal("fastForward", branches(d).find((x) => x.name === "locale")), "Pas de branche distante");
   assert.equal(P.refusal("fastForward", { name: "x", sync: "gone", upstream: { remote: "origin", ref: "refs/heads/x" } }), "La branche distante a été supprimée");
 });
+
+test("menu de suppression (d), comme lazygit : choix distants barrés sans branche distante", () => {
+  const withRemote = { name: "feat", sync: "✓", upstream: { remote: "origin", ref: "refs/heads/feat" } };
+  assert.deepEqual(P.deleteChoices(withRemote).map((c) => [c.key, c.id, c.enabled]),
+    [["c", "local", true], ["r", "remote", true], ["b", "both", true]]);
+  assert.deepEqual(P.deleteChoices({ name: "x", sync: "", upstream: null }).map((c) => c.enabled), [true, false, false]);
+  assert.deepEqual(P.deleteChoices({ ...withRemote, sync: "gone" }).map((c) => c.enabled), [true, false, false]);
+  assert.deepEqual(P.deleteRemoteArgs(withRemote), ["push", "origin", "--delete", "refs/heads/feat"]);
+  assert.deepEqual(P.forceDeleteArgs("feat"), ["branch", "-D", "feat"]);
+  assert.equal(P.notMerged({ code: 1, stderr: "error: the branch 'feat' is not fully merged\nhint: ..." }), true);
+  assert.equal(P.notMerged({ code: 1, stderr: "error: branch 'x' not found" }), false);
+});
+
+test("suppression d'une branche fusionnée en squash : refus, puis suppression forcée ; et côté distant", () => {
+  const remote = realpathSync(mkdtempSync(join(tmpdir(), "outils-del-")));
+  sh(remote, "init", "-q", "--bare", "-b", "main");
+  const d = newRepo();
+  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  sh(d, "remote", "add", "origin", remote); sh(d, "push", "-q", "-u", "origin", "main");
+  sh(d, "checkout", "-qb", "feat");
+  writeFileSync(join(d, "f.txt"), "f"); sh(d, "add", "."); sh(d, "commit", "-qm", "f");
+  sh(d, "push", "-q", "-u", "origin", "feat");
+  sh(d, "checkout", "-q", "main");
+  sh(d, "merge", "-q", "--squash", "feat"); sh(d, "commit", "-qm", "squash feat");
+  const feat = branches(d).find((b) => b.name === "feat");
+  // Comme GitHub après la fusion : la branche distante est supprimée.
+  sh(d, ...P.deleteRemoteArgs(feat));
+  assert.equal(run(remote, ["rev-parse", "--verify", "-q", "refs/heads/feat"]).code, 1);
+  sh(d, ...P.FETCH_ARGS);
+  const r = run(d, P.deleteArgs("feat"));
+  assert.equal(P.notMerged(r), true);
+  sh(d, ...P.forceDeleteArgs("feat"));
+  assert.equal(branches(d).some((b) => b.name === "feat"), false);
+});
