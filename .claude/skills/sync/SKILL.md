@@ -14,6 +14,7 @@ originaux, jamais les copies. Trois choses rendent le report sûr :
   `upstream/VERSION` : **la version de Herdr du dernier report**.
 - `COPIES.md` (à côté de ce fichier) : chaque copie, son original et **tous les
   ajouts d'Antoine** à garder.
+- `EN-ATTENTE.md` : les envies d'Antoine bloquées par un manque de Herdr.
 - `upstream.sh` : `diff` (ce que Herdr a changé depuis), `check` (fichiers de Herdr
   utilisés tels quels et disparus), `snapshot` (enregistre la nouvelle référence).
 
@@ -22,7 +23,8 @@ originaux, jamais les copies. Trois choses rendent le report sûr :
 1. Lis `COPIES.md` en entier.
 2. `bash .claude/skills/sync/upstream.sh diff` depuis la racine du dépôt.
    La première ligne donne la version du dernier report et la version installée.
-   - Même version et sortie 0 : rien à faire, dis-le à Antoine avec la version.
+   - Même version et sortie 0 : rien à reporter, dis-le à Antoine avec la version
+     (passe quand même par l'étape 8 si la liste en attente a changé depuis).
    - Sortie 1 : le diff montre chaque changement de Herdr.
 3. `bash .claude/skills/sync/upstream.sh check` : une icône de Herdr
    disparue est à remplacer dans le mod `antoine` (cherche son nouveau nom chez Herdr).
@@ -39,8 +41,12 @@ originaux, jamais les copies. Trois choses rendent le report sûr :
 7. Tout reporté et vérifié : `bash .claude/skills/sync/upstream.sh snapshot`
    (met `upstream/VERSION` à la version installée). Mets `COPIES.md` à jour si un
    ajout a changé de forme. Commit avec un message qui nomme la version de Herdr.
-8. Compte rendu à Antoine : version d'avant et d'après, ce qui a été reporté, ce qui
-   ne l'a pas été et pourquoi.
+8. Lis `EN-ATTENTE.md` (à côté de ce fichier). Pour chaque envie, vérifie avec
+   « Comment vérifier » si la version installée lève le blocage (cherche dans
+   `~/.config/herdr-app/herdr.d.ts`, `gpui-kit.d.ts`, `AGENTS.md`). Ne l'implémente
+   pas : dis seulement lesquelles sont devenues possibles.
+9. Compte rendu à Antoine : version d'avant et d'après, ce qui a été reporté, ce qui
+   ne l'a pas été et pourquoi, et les envies en attente devenues possibles.
 
 ## Erreurs à éviter
 

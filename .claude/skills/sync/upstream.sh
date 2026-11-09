@@ -11,7 +11,7 @@ REPO="$(cd "$(dirname "$0")/../../.." && pwd)"
 SNAP="$REPO/upstream"
 # Original (in Herdr's folder) -> where it lives in the snapshot.
 ORIGINALS=(mods/agents mods/spaces mods/tabs layouts/main.json themes/monokai.json
-  mods/files/main.js mods/workspace-chrome/spinner.svg mods/confirm/main.js)
+  mods/files/main.js mods/workspace-chrome/spinner.svg mods/confirm/main.js mods/new-menu)
 
 case "${1:-}" in
   snapshot)

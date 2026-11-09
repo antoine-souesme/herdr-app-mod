@@ -56,14 +56,23 @@ Ajouts d'Antoine :
 - **Onglets de fichiers** (`FileTabs` de `filetabs.js`) : affichés après les onglets
   de terminaux ; quand un fichier est affiché, aucun onglet de terminal n'a l'air
   actif ni sa croix ; cliquer un onglet de terminal revient aux terminaux
-  (`this.files.toTerminals()`).
+  (`this.files.toTerminals()`). Le clic molette ferme un onglet de fichier non épinglé.
+- **Clic molette sur un onglet de terminal** : le ferme (`tab.close {id}`, `on_mouse_down("middle")`).
+- **Icône des visionneurs d'image** : un onglet du visionneur d'image (panneau du mod
+  `antoine`) montre l'icône Material de son nom (`iconFor` de `icons.js`).
+- **Fichiers à droite** : `render` range d'abord les onglets de terminaux, puis un
+  séparateur, puis les visionneurs d'image de la space et les onglets de fichiers ;
+  sans eux, pas de séparateur. Libellés des fichiers : `fileLabels`.
+- **Clic droit sur un onglet de fichier** : menu d'Antoine (`openTabMenu` de
+  `filetabs.js` : Épingler ou Désépingler) ; plus de bouton punaise.
+- **Menu +** : ouvre `antoine-new-menu` au lieu de `new-menu` (hauteur 543 au lieu de 512).
 - **Croix des onglets de terminaux** : présente sur chaque onglet, mais invisible
   et sans effet hors de l'onglet actif, pour que changer d'onglet ne décale pas
   les autres (Herdr ne l'ajoute qu'à l'onglet actif).
 - **Dépôt de fichiers du Finder** : `.on_drop` sur la racine de la barre appelle
   `dropFiles`, qui garde les fichiers (pas les dossiers) et les ouvre comme
-  l'explorateur (`openFiles` de `files.js`, le dernier est affiché) ; tous
-  entrent dans les fichiers récents de `cmd-p` (`rememberAll` de `filestore.js`).
+  l'explorateur (`openPaths` de `open.js`, le dernier est affiché) ; tous entrent
+  dans les fichiers récents de `cmd-p`.
 - Plus de `export default class … extends View` : `export class TabBar` avec
   `constructor(_props, cx)`.
 - Icônes de fenêtre Windows lues dans `mods/antoine/win-*.svg` (copies identiques).
@@ -102,6 +111,12 @@ Tout le reste suit `monokai`.
 `cmd-s` → `antoine.save`, `cmd-w` → `antoine.close`, `cmd-p` → `antoine.quickopen`
 (remplace, dans cette disposition, le `cmd-p` de Herdr qui ouvre `picker`). Le reste du fichier est celui de
 Herdr ; vérifier après une mise à jour que la section `layout:antoine` est toujours là.
+
+## 7 bis. `mods/antoine-new-menu/` ← `mods/new-menu/`
+
+Ajout d'Antoine : la ligne **« Ouvrir un fichier… »** (icône `mods/files/file.svg`),
+avant « New space », lance `antoine.open_file` (sélecteur de fichier du Finder, puis
+`openPaths` de `open.js`, dans `filetabs.js`) ; la hauteur du menu prend 31 px de plus (`h(...)`).
 
 ## 8. Fichiers de Herdr utilisés tels quels (à vérifier qu'ils existent encore)
 

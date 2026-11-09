@@ -191,3 +191,19 @@ test("openFiles with no file changes nothing", () => {
   const st = F.openFile(null, "w1", "/a.md");
   assert.equal(F.openFiles(st, "w1", []), st);
 });
+
+test("isImage: les images vont au visionneur, le reste à Fresh", () => {
+  for (const p of ["/a/shot.png", "/a/photo.JPG", "/a/b.jpeg", "/a/logo.svg", "/a/anim.gif", "/a/x.webp"]) assert.equal(F.isImage(p), true, p);
+  for (const p of ["/a/notes.md", "/a/main.js", "/a/png", "/a/image.png.txt"]) assert.equal(F.isImage(p), false, p);
+});
+
+test("fileLabels: le nom seul, et les dossiers quand deux fichiers ont le même nom", () => {
+  const l = F.fileLabels(["/a/x/backlog.md", "/a/notes.md", "/a/y/backlog.md", "/b/x/backlog.md"]);
+  assert.equal(l.get("/a/notes.md"), "notes.md");
+  assert.equal(l.get("/a/y/backlog.md"), "backlog.md — a/y");
+  assert.equal(l.get("/a/x/backlog.md"), "backlog.md — a/x");
+  assert.equal(l.get("/b/x/backlog.md"), "backlog.md — b/x");
+  const two = F.fileLabels(["/p/one/index.js", "/p/two/index.js"]);
+  assert.equal(two.get("/p/one/index.js"), "index.js — one");
+  assert.equal(two.get("/p/two/index.js"), "index.js — two");
+});

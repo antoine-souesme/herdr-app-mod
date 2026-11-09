@@ -21,10 +21,21 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
     icônes du thème Material Icon de VS Code (MIT).
   - `quickopen.js` : règles pures de la recherche de fichiers (`cmd-p`) et des
     fichiers récents (état partagé `antoine.recent`) ; `quickopenview.js` : sa fenêtre.
+  - `open.js` : un fichier ouvert (explorateur, `cmd-p`, dépôt du Finder, menu
+    + « Ouvrir un fichier… ») devient un onglet de fichier du workspace, montré
+    par l'éditeur de Herdr (`fileview.js`). On épingle et désépingle par un clic
+    droit sur l'onglet (`TabMenu` de `filetabs.js`). Deux fichiers de même nom
+    affichent aussi leur dossier (`fileLabels` de `files.js`). Fresh, l'éditeur
+    du terminal, attend une mise à jour de Herdr (`EN-ATTENTE.md`).
+    Les images (`isImage` de `files.js`) s'ouvrent à la place dans `imageview.js`
+    (onglet du mod, `view: "image"`), qui les copie d'abord dans
+    `~/.config/herdr-app/data/antoine-images/` : `image()` ne lit que là.
   - Herdr refuse qu'un mod importe un fichier d'un autre mod : tout ce qui
     partage du code reste dans `antoine`.
 - `~/.config/herdr-app/mods/antoine-spaces/` et `antoine-agents/` : copies
   des mods `spaces` et `agents` de Herdr, filtrées sur le workspace ouvert.
+- `~/.config/herdr-app/mods/antoine-new-menu/` : copie du menu + de Herdr, avec
+  « Ouvrir un fichier… » (sélecteur du Finder).
 - `~/.config/herdr-app/layouts/antoine.json` : la disposition d'Antoine
   (copie de `main` avec la barre des workspaces).
 
@@ -44,6 +55,8 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
   puis `herdr-app status` (aucune erreur), puis essai dans l'app
   (`herdr-app shot` pour voir la fenêtre).
 - Textes de l'interface en français, avec les accents. Couleurs via `theme()`.
+- Une envie que Herdr ne permet pas encore va dans
+  `.claude/skills/sync/EN-ATTENTE.md` ; le skill `sync` la revérifie à chaque mise à jour.
 - En cas de souci : `ctrl-alt-shift-escape` remet la disposition par défaut.
 
 ## Ce dossier
