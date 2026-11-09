@@ -219,3 +219,34 @@ test("la branche qu'on quitte compte aussi comme visitée (lazygit)", () => {
   assert.equal(m.get("dev"), 200);
   assert.equal(m.get("main"), 200);
 });
+
+test("arborescence des changements : dossiers, fichiers, état indexé du dossier", () => {
+  const changes = [
+    { path: "src/a/x.js", kind: "M", staged: true },
+    { path: "src/a/y.js", kind: "A", staged: false },
+    { path: "src/b.js", kind: "D", staged: true },
+    { path: "README.md", kind: "M", staged: false },
+    { path: "docs/only/one.md", kind: "A", staged: true },
+  ];
+  const rows = P.changeTree(changes);
+  assert.deepEqual(rows.map((r) => [r.kind, r.name, r.depth]), [
+    ["dir", "docs/only", 0], ["file", "one.md", 1],
+    ["dir", "src", 0], ["dir", "a", 1], ["file", "x.js", 2], ["file", "y.js", 2], ["file", "b.js", 1],
+    ["file", "README.md", 0],
+  ]);
+  assert.equal(rows[0].staged, "all");
+  assert.equal(rows[2].staged, "some");
+  assert.equal(rows[2].path, "src");
+  assert.equal(rows[0].path, "docs/only");
+  assert.equal(rows[4].change.path, "src/a/x.js");
+});
+
+test("espace sur un dossier : tout indexer, ou tout retirer s'il l'est déjà", () => {
+  assert.deepEqual(P.stageArgs({ kind: "dir", path: "src", staged: "some" }), ["add", "-A", "--", "src"]);
+  assert.deepEqual(P.stageArgs({ kind: "dir", path: "src", staged: "all" }), ["reset", "-q", "--", "src"]);
+});
+
+test("la touche ` bascule liste et arbre dans les changements", () => {
+  assert.equal(P.keyAction("changes", "`"), "toggleTree");
+  assert.equal(P.keyAction("branches", "`"), null);
+});
