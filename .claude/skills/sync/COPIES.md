@@ -105,6 +105,14 @@ Tout le reste suit `monokai`.
   `rounded(8)` depuis Herdr 0.1.14), textes en français.
 - `mods/antoine/quickopenview.js` (recherche de fichiers, `cmd-p`) : défilement à la
   molette et suivi de la sélection repris de `mods/picker/main.js`, liste à hauteur de ligne fixe.
+- **Hors Herdr — herdr-git-graph** (https://github.com/rabeeh-ta/herdr-git-graph,
+  licence MIT, © 2026 Rabeeh T A ; originaux au commit `2f4fe0f` dans
+  `upstream/herdr-git-graph/`, à revoir à la main, le skill `sync` ne le suit pas) :
+  - `mods/antoine/lanes.js` ← `mods/git-graph/lanes.js` (copie identique) ;
+  - `mods/antoine/gitlog.js` ← `mods/git-graph/git.js`, de `READ` à `labelsOf`
+    (sans `parseStatus`), libellé « Changements non validés (n) » en français ;
+  - dessin du graphe de `mods/antoine/gitview.js` sur le modèle de
+    `mods/git-graph/graph.js` (lignes en `paint_path`, `ROW 24`, `LANE 12`, couleurs ansi).
 
 ## 7. Raccourcis : `keys.json`, section `layout:antoine`
 
