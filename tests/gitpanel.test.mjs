@@ -251,11 +251,19 @@ test("la touche ` bascule liste et arbre dans les changements", () => {
   assert.equal(P.keyAction("branches", "`"), null);
 });
 
-test("PR ouvertes : par branche, rien si gh échoue", () => {
-  const prs = P.parsePrs('[{"headRefName":"feat/outils","isDraft":false,"number":1,"url":"u1"},{"headRefName":"wip","isDraft":true,"number":7,"url":"u7"}]');
-  assert.deepEqual(prs.get("feat/outils"), { number: 1, draft: false, url: "u1" });
+test("PR : ouvertes et fusionnées par branche, l'ouverte d'abord, rien si gh échoue", () => {
+  const prs = P.parsePrs(JSON.stringify([
+    { headRefName: "feat/outils", isDraft: false, number: 3, url: "u3", state: "OPEN" },
+    { headRefName: "feat/outils", isDraft: false, number: 1, url: "u1", state: "MERGED" },
+    { headRefName: "wip", isDraft: true, number: 7, url: "u7", state: "OPEN" },
+    { headRefName: "vieille", isDraft: false, number: 2, url: "u2", state: "MERGED" },
+    { headRefName: "abandon", isDraft: false, number: 4, url: "u4", state: "CLOSED" },
+  ]));
+  assert.deepEqual(prs.get("feat/outils"), { number: 3, draft: false, url: "u3", state: "open" });
   assert.equal(prs.get("wip").draft, true);
+  assert.deepEqual(prs.get("vieille"), { number: 2, draft: false, url: "u2", state: "merged" });
+  assert.equal(prs.has("abandon"), false);
   assert.equal(P.parsePrs("pas du json").size, 0);
   assert.equal(P.parsePrs("").size, 0);
-  assert.deepEqual(P.PR_ARGS, ["pr", "list", "--state", "open", "--json", "number,headRefName,isDraft,url", "--limit", "100"]);
+  assert.deepEqual(P.PR_ARGS, ["pr", "list", "--state", "all", "--json", "number,headRefName,isDraft,url,state", "--limit", "200"]);
 });
