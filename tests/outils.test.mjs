@@ -31,7 +31,7 @@ test("termFor retrouve le terminal vivant du space", () => {
 test("orphanTerms : seuls les outils-… vivants sans space", () => {
   const terms = [{ address: "t1", name: "outils-s1", state: "live" }, { address: "t3", name: "outils-s9", state: "live" },
     { address: "t4", name: "autre", state: "live" }, { address: "t5", name: "outils-s8", state: "exited" }];
-  assert.deepEqual(O.orphanTerms(terms, ["s1"]), ["t3"]);
+  assert.deepEqual(O.orphanTerms(terms, ["s1"], true), ["t3"]);
 });
 
 test("withTerminal change le bloc sans toucher l'original", () => {
@@ -61,4 +61,11 @@ test("largeur : Outils garde la sienne, Files et Changes la leur", () => {
   assert.equal(O.panelWidth("files", "changes", 400, {}).px, null);
   assert.equal(O.panelWidth("outils", "outils", 900, {}).px, null);
   assert.equal(O.panelWidth("outils", "files", 900, {}).px, 368);
+});
+
+test("au démarrage (spaces pas prêts ou vides), aucun terminal n'est tué", () => {
+  const terms = [{ address: "t1", name: "outils-s1", state: "live" }];
+  assert.deepEqual(O.orphanTerms(terms, [], true), []);
+  assert.deepEqual(O.orphanTerms(terms, ["s2"], false), []);
+  assert.deepEqual(O.orphanTerms(terms, ["s2"], true), ["t1"]);
 });

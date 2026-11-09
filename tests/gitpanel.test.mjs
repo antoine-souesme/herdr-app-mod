@@ -149,3 +149,23 @@ test("un worktree montre le dépôt principal", () => {
   assert.equal(rootOf(d), d);
   assert.equal(P.mainRoot(""), null);
 });
+
+test("lectures en série : une demande pendant une lecture abandonnée est quand même servie", async () => {
+  const runs = [];
+  let release;
+  const read = P.serial(async (n) => { runs.push(n); if (n === 1) await new Promise((r) => { release = r; }); });
+  const first = read(1);
+  const second = read(2); // pendant la première : mise de côté
+  release();
+  await first; await second;
+  await new Promise((r) => setTimeout(r, 0));
+  assert.deepEqual(runs, [1, 2]);
+});
+
+test("lectures en série : une erreur n'empêche pas la suivante", async () => {
+  const runs = [];
+  const read = P.serial(async (n) => { runs.push(n); if (n === 1) throw new Error("x"); });
+  await read(1).catch(() => {});
+  await read(2);
+  assert.deepEqual(runs, [1, 2]);
+});
