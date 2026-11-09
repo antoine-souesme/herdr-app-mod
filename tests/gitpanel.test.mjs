@@ -117,3 +117,35 @@ test("message d'erreur de git", () => {
   assert.equal(P.gitMessage({ code: 128, stderr: "fatal: not a git repository\n" }), "not a git repository");
   assert.equal(P.gitMessage({ code: 1, stderr: "" }), "La commande git a échoué");
 });
+
+test("âge d'un commit, en français et court", () => {
+  const now = 1_800_000_000;
+  assert.equal(P.ago(now - 20, now), "maintenant");
+  assert.equal(P.ago(now - 5 * 60, now), "5 min");
+  assert.equal(P.ago(now - 3 * 3600, now), "3 h");
+  assert.equal(P.ago(now - 2 * 86400, now), "2 j");
+  assert.equal(P.ago(now - 15 * 86400, now), "2 sem");
+  assert.equal(P.ago(now - 70 * 86400, now), "2 mois");
+  assert.equal(P.ago(now - 800 * 86400, now), "2 ans");
+  assert.equal(P.ago(now - 400 * 86400, now), "1 an");
+  assert.equal(P.ago(null, now), "");
+});
+
+test("dossier suivi : celui du premier terminal du space, sinon son dossier de départ", () => {
+  const space = { folder: "/depart", tabs: [{ id: "tb1" }, { id: "tb2" }] };
+  const panes = [{ tab: "tb2", cwd: "/autre" }, { tab: "tb1", cwd: null }, { tab: "tb1", cwd: "/repo/sous" }];
+  assert.equal(P.spaceFolder(space, panes, "/home"), "/repo/sous");
+  assert.equal(P.spaceFolder(space, [], "/home"), "/depart");
+  assert.equal(P.spaceFolder({ folder: "", tabs: [] }, [], "/home"), "/home");
+});
+
+test("un worktree montre le dépôt principal", () => {
+  const d = newRepo();
+  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  const wt = d + "-wt2";
+  sh(d, "worktree", "add", "-q", "-b", "wt2", wt);
+  const rootOf = (cwd) => P.mainRoot(sh(cwd, ...P.ROOT_ARGS));
+  assert.equal(rootOf(wt), d);
+  assert.equal(rootOf(d), d);
+  assert.equal(P.mainRoot(""), null);
+});
