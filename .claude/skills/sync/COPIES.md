@@ -31,10 +31,11 @@ Ajouts d'Antoine :
   `antoine.sub.<id>` sur le terminal de l'agent. `subs.js` (pur, testé) la lit ; dans
   `main.js`, méthodes `subs`, `subStatus`, `hookRow`, `this.hooked` dans `render`, et
   `subRow`, `withKids`, `fold`, `urgency` passent par `subs` au lieu de `tree`.
-- **Retour aux terminaux au clic sur un agent** (`focusAgent`, avant `clean`) :
-  les trois `run("pane.focus", …)` des lignes d'agent et de sous-agent passent par
+- **Retour aux terminaux au clic sur un agent** (`focusAgent(target)`, avant `clean`) :
+  tous les `run("pane.focus", …)` des lignes d'agent et de sous-agent passent par
   `focusAgent`, qui remet `shown` à `null` dans `antoine.files` pour le workspace
-  ouvert, puis donne le focus au terminal de l'agent.
+  ouvert, puis lance `pane.focus` avec `target` (`{ pane }` ou, pour un sous-agent
+  gardé dans un terminal, `{ terminal }` depuis Herdr 0.1.14).
 - `mod.json` : `cloned_from` (laissé par `mod.clone`).
 
 ## 2. `mods/antoine-spaces/` ← `mods/spaces/`
@@ -91,7 +92,8 @@ Tout le reste suit `monokai`.
   masqués comme VS Code (`EXCLUDED`), grisé de ce que git ignore, couleurs git.
 - `mods/antoine/spinner.svg` ← `mods/workspace-chrome/spinner.svg` (copie identique).
 - `mods/antoine/explorer.js`, classe `ExplorerTrash` : écrite sur le modèle de
-  `mods/confirm/main.js` (mêmes touches Entrée / Échap, même allure), textes en français.
+  `mods/confirm/main.js` (mêmes touches Entrée / Échap, même allure, coins arrondis
+  `rounded(8)` depuis Herdr 0.1.14), textes en français.
 - `mods/antoine/quickopenview.js` (recherche de fichiers, `cmd-p`) : défilement à la
   molette et suivi de la sélection repris de `mods/picker/main.js`, liste à hauteur de ligne fixe.
 
