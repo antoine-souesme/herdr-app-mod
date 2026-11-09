@@ -286,3 +286,10 @@ test("branche distante supprimée après fusion : vue après un fetch --prune", 
   sh(d, ...P.FETCH_ARGS);
   assert.equal(branches(d).find((b) => b.name === "feat").sync, "gone");
 });
+
+test("f lance un fetch, comme lazygit (sauf dans les branches, où lazygit avance la branche)", () => {
+  assert.equal(P.keyAction("changes", "f"), "fetch");
+  assert.equal(P.keyAction("graph", "f"), "fetch");
+  assert.equal(P.keyAction("branches", "f"), null);
+  assert.equal(P.keyAction(null, "f"), null);
+});
