@@ -199,7 +199,7 @@ test("état distant, comme lazygit", () => {
   assert.equal(P.syncText("origin/main", "ahead 2"), "↑2");
   assert.equal(P.syncText("origin/main", "behind 3"), "↓3");
   assert.equal(P.syncText("origin/main", "ahead 2, behind 3"), "↑2↓3");
-  assert.equal(P.syncText("origin/x", "gone"), "?");
+  assert.equal(P.syncText("origin/x", "gone"), "gone");
 });
 
 test("date courte de la liste des branches", () => {
@@ -266,4 +266,19 @@ test("PR : ouvertes et fusionnées par branche, l'ouverte d'abord, rien si gh é
   assert.equal(P.parsePrs("pas du json").size, 0);
   assert.equal(P.parsePrs("").size, 0);
   assert.deepEqual(P.PR_ARGS, ["pr", "list", "--state", "all", "--json", "number,headRefName,isDraft,url,state", "--limit", "200"]);
+});
+
+test("branche distante supprimée après fusion : vue après un fetch --prune", () => {
+  assert.deepEqual(P.FETCH_ARGS, ["fetch", "--all", "--prune", "--quiet"]);
+  const remote = realpathSync(mkdtempSync(join(tmpdir(), "outils-gone-")));
+  sh(remote, "init", "-q", "--bare", "-b", "main");
+  const d = newRepo();
+  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  sh(d, "remote", "add", "origin", remote);
+  sh(d, "push", "-q", "-u", "origin", "main");
+  sh(d, "checkout", "-qb", "feat"); sh(d, "push", "-q", "-u", "origin", "feat");
+  sh(remote, "branch", "-D", "feat"); // supprimée côté distant, comme GitHub après la fusion
+  assert.equal(branches(d).find((b) => b.name === "feat").sync, "✓");
+  sh(d, ...P.FETCH_ARGS);
+  assert.equal(branches(d).find((b) => b.name === "feat").sync, "gone");
 });
