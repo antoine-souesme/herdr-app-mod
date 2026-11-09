@@ -287,9 +287,42 @@ test("branche distante supprimée après fusion : vue après un fetch --prune", 
   assert.equal(branches(d).find((b) => b.name === "feat").sync, "gone");
 });
 
-test("f lance un fetch, comme lazygit (sauf dans les branches, où lazygit avance la branche)", () => {
+test("f : fetch dans les changements et le graphe, avance de la branche dans les branches (lazygit)", () => {
   assert.equal(P.keyAction("changes", "f"), "fetch");
   assert.equal(P.keyAction("graph", "f"), "fetch");
-  assert.equal(P.keyAction("branches", "f"), null);
+  assert.equal(P.keyAction("branches", "f"), "fastForward");
   assert.equal(P.keyAction(null, "f"), null);
+});
+
+test("f sur une branche : récupère ses commits distants sans passer dessus", () => {
+  const remote = realpathSync(mkdtempSync(join(tmpdir(), "outils-ff-")));
+  sh(remote, "init", "-q", "--bare", "-b", "main");
+  const d = newRepo();
+  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  sh(d, "remote", "add", "origin", remote);
+  sh(d, "push", "-q", "-u", "origin", "main");
+  sh(d, "checkout", "-qb", "feat"); sh(d, "push", "-q", "-u", "origin", "feat");
+  // Quelqu'un d'autre pousse sur main et sur feat.
+  const other = realpathSync(mkdtempSync(join(tmpdir(), "outils-other-")));
+  sh(other, "clone", "-q", remote, "c");
+  const c = join(other, "c");
+  writeFileSync(join(c, "m.txt"), "m"); sh(c, "add", "."); sh(c, "commit", "-qm", "m"); sh(c, "push", "-q", "origin", "main");
+  sh(c, "checkout", "-qb", "feat", "origin/feat");
+  writeFileSync(join(c, "f.txt"), "f"); sh(c, "add", "."); sh(c, "commit", "-qm", "f"); sh(c, "push", "-q", "origin", "feat");
+  // main n'est pas la branche actuelle : elle avance sans checkout.
+  let b = branches(d);
+  const main = b.find((x) => x.name === "main");
+  assert.equal(P.refusal("fastForward", main), null);
+  sh(d, ...P.fastForwardArgs(main));
+  assert.equal(sh(d, "log", "-1", "--format=%s", "main").trim(), "m");
+  assert.equal(sh(d, "branch", "--show-current").trim(), "feat");
+  // feat est la branche actuelle : pull --ff-only.
+  const feat = branches(d).find((x) => x.name === "feat");
+  assert.deepEqual(P.fastForwardArgs(feat), ["pull", "--ff-only"]);
+  sh(d, ...P.fastForwardArgs(feat));
+  assert.equal(sh(d, "log", "-1", "--format=%s").trim(), "f");
+  // Sans branche distante, ou si elle a été supprimée : refusé.
+  sh(d, "branch", "locale");
+  assert.equal(P.refusal("fastForward", branches(d).find((x) => x.name === "locale")), "Pas de branche distante");
+  assert.equal(P.refusal("fastForward", { name: "x", sync: "gone", upstream: { remote: "origin", ref: "refs/heads/x" } }), "La branche distante a été supprimée");
 });
