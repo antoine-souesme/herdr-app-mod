@@ -14,7 +14,7 @@ const run = (cwd, args) => { const r = spawnSync("git", args, { cwd, env, encodi
 const sh = (cwd, ...args) => { const r = run(cwd, args); assert.equal(r.code, 0, r.stderr); return r.stdout; };
 const newRepo = () => { const d = realpathSync(mkdtempSync(join(tmpdir(), "outils-panel-"))); sh(d, "init", "-q", "-b", "main"); return d; };
 const changes = (d) => P.parseChanges(sh(d, ...P.STATUS_ARGS));
-const branches = (d) => P.parseBranches(sh(d, ...P.BRANCH_ARGS), sh(d, ...P.WORKTREE_ARGS), d, (run(d, P.REFLOG_ARGS).stdout ?? "")); // sans commit, git reflog échoue : la vue passe ""
+const branches = (d) => P.parseBranches(sh(d, ...P.BRANCH_ARGS), sh(d, ...P.WORKTREE_ARGS), d);
 
 test("changements : état et indexation", () => {
   const d = newRepo();
@@ -171,26 +171,35 @@ test("lectures en série : une erreur n'empêche pas la suivante", async () => {
   assert.deepEqual(runs, [1, 2]);
 });
 
-test("branches : ordre de lazygit, date du dernier passage, état distant", () => {
+test("branches : actuelle d'abord puis par date du dernier commit, état distant", () => {
+  const at = (d, msg, time) => {
+    writeFileSync(join(d, `${msg}.txt`), msg); sh(d, "add", ".");
+    const r = spawnSync("git", ["commit", "-qm", msg], { cwd: d, encoding: "utf8",
+      env: { ...env, GIT_COMMITTER_DATE: `@${time} +0000`, GIT_AUTHOR_DATE: `@${time} +0000` } });
+    assert.equal(r.status, 0, r.stderr);
+  };
   const remote = realpathSync(mkdtempSync(join(tmpdir(), "outils-remote-")));
   sh(remote, "init", "-q", "--bare", "-b", "main");
   const d = newRepo();
-  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  at(d, "init", 1_000_000);
   sh(d, "remote", "add", "origin", remote);
   sh(d, "push", "-q", "-u", "origin", "main");
   sh(d, "branch", "vieille");
   sh(d, "checkout", "-qb", "dev");
   sh(d, "push", "-q", "-u", "origin", "dev");
-  writeFileSync(join(d, "b.txt"), "b"); sh(d, "add", "."); sh(d, "commit", "-qm", "b");
+  at(d, "b", 3_000_000);
+  sh(d, "checkout", "-qb", "autre", "main");
+  at(d, "c", 2_000_000);
   sh(d, "checkout", "-q", "main");
   const b = branches(d);
-  assert.deepEqual(b.map((x) => x.name), ["main", "dev", "vieille"]);
+  assert.deepEqual(b.map((x) => x.name), ["main", "dev", "autre", "vieille"]);
   assert.equal(b[0].current, true);
-  assert.equal(typeof b[1].checkedOut, "number");
-  assert.equal(b[2].checkedOut, null);
+  assert.equal(b[1].committed, 3_000_000);
+  assert.equal(b[2].committed, 2_000_000);
+  assert.equal(b[3].committed, 1_000_000);
   assert.equal(b[0].sync, "✓");
   assert.equal(b[1].sync, "↑1");
-  assert.equal(b[2].sync, "");
+  assert.equal(b[3].sync, "");
 });
 
 test("état distant, comme lazygit", () => {
@@ -214,11 +223,6 @@ test("date courte de la liste des branches", () => {
   assert.equal(P.shortAgo(null, now), "");
 });
 
-test("la branche qu'on quitte compte aussi comme visitée (lazygit)", () => {
-  const m = P.parseCheckouts("HEAD@{200}\0checkout: moving from main to dev\nHEAD@{100}\0checkout: moving from dev to main\n");
-  assert.equal(m.get("dev"), 200);
-  assert.equal(m.get("main"), 200);
-});
 
 test("arborescence des changements : dossiers, fichiers, état indexé du dossier", () => {
   const changes = [
