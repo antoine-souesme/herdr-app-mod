@@ -50,3 +50,15 @@ test("findNode trouve un nœud par id, ou null", () => {
   assert.equal(O.findNode(tree, "c").id, "c");
   assert.equal(O.findNode(tree, "z"), null);
 });
+
+test("largeur : Outils garde la sienne, Files et Changes la leur", () => {
+  let r = O.panelWidth("files", "outils", 368, {});
+  assert.deepEqual(r, { px: 700, widths: { panel: 368 } });
+  r = O.panelWidth("outils", "changes", 820, r.widths);
+  assert.deepEqual(r, { px: 368, widths: { panel: 368, outils: 820 } });
+  r = O.panelWidth("changes", "outils", 400, r.widths);
+  assert.deepEqual(r, { px: 820, widths: { panel: 400, outils: 820 } });
+  assert.equal(O.panelWidth("files", "changes", 400, {}).px, null);
+  assert.equal(O.panelWidth("outils", "outils", 900, {}).px, null);
+  assert.equal(O.panelWidth("outils", "files", 900, {}).px, 368);
+});

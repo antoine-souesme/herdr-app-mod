@@ -76,6 +76,10 @@ Ajouts d'Antoine :
 - Plus de `export default class … extends View` : `export class TabBar` avec
   `constructor(_props, cx)`.
 - Icônes de fenêtre Windows lues dans `mods/antoine/win-*.svg` (copies identiques).
+- **Bouton « Outils »** (`mods/antoine/outils.svg`) après Files et Changes, toujours
+  affiché ; panneau ouvert et choisi par `selectPanel`, qui donne à Outils sa propre
+  largeur (`panelWidth` de `outils.js`, retenue dans `localStorage` `panelWidths`) ;
+  `syncPanel` accepte aussi `outils` comme panneau retenu par space.
 
 ## 4. `layouts/antoine.json` ← `layouts/main.json`
 
@@ -86,6 +90,10 @@ Ajouts d'Antoine (par `id` de bloc) :
   `tabs` → mod `antoine`, `view: "tabs"`.
 - `work-stack` (nouveau, pile autour de `main`) avec `file-view` (mod `antoine`,
   `view: "file"`) : l'éditeur de fichiers à la place des terminaux.
+- `outils` (nouveau, colonne dans la pile `panel-body`, après `changes`) :
+  `outils-bar` (34 px, mod `antoine`, `view: "outils-bar"`), `outils-git` (mod
+  `antoine`, `view: "git"`), `outils-term` (bloc `{ "terminal": … }` dont la barre
+  change l'adresse selon le space).
 - Racine : `resizable: true`, `cloned_from`.
 
 ## 5. `themes/antoine-monokai.json` ← `themes/monokai.json`
