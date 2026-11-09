@@ -250,3 +250,12 @@ test("la touche ` bascule liste et arbre dans les changements", () => {
   assert.equal(P.keyAction("changes", "`"), "toggleTree");
   assert.equal(P.keyAction("branches", "`"), null);
 });
+
+test("PR ouvertes : par branche, rien si gh échoue", () => {
+  const prs = P.parsePrs('[{"headRefName":"feat/outils","isDraft":false,"number":1,"url":"u1"},{"headRefName":"wip","isDraft":true,"number":7,"url":"u7"}]');
+  assert.deepEqual(prs.get("feat/outils"), { number: 1, draft: false, url: "u1" });
+  assert.equal(prs.get("wip").draft, true);
+  assert.equal(P.parsePrs("pas du json").size, 0);
+  assert.equal(P.parsePrs("").size, 0);
+  assert.deepEqual(P.PR_ARGS, ["pr", "list", "--state", "open", "--json", "number,headRefName,isDraft,url", "--limit", "100"]);
+});

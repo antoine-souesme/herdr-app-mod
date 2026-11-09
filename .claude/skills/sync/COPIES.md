@@ -123,6 +123,7 @@ Tout le reste suit `monokai`.
     `mods/git-graph/graph.js` (lignes en `paint_path`, `ROW 24`, `LANE 12`, couleurs ansi).
 - **Hors Herdr — Lucide** (https://lucide.dev, licence ISC, `lucide-static` 0.460.0) :
   `mods/antoine/outils.svg` (wrench), `view-list.svg` (list), `view-tree.svg` (list-tree),
+  `git-pull-request.svg`, `git-pull-request-draft.svg`,
   copies identiques avec leur ligne de licence.
 
 ## 7. Raccourcis : `keys.json`, section `layout:antoine`
