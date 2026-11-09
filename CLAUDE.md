@@ -30,6 +30,15 @@ Herdr), puis `herdr.d.ts` et `gpui-kit.d.ts` dans ce même dossier pour l'API.
     Les images (`isImage` de `files.js`) s'ouvrent à la place dans `imageview.js`
     (onglet du mod, `view: "image"`), qui les copie d'abord dans
     `~/.config/herdr-app/data/antoine-images/` : `image()` ne lit que là.
+  - Panneau « Outils » (bouton à droite de Files et Changes, nœud `outils` de
+    la disposition) : `outilsbar.js` (`view: "outils-bar"`) montre ou cache
+    chaque outil et tient le terminal de chaque space (terminal du core nommé
+    `outils-…`, montré par le bloc `outils-term`) ; `gitview.js` (`view: "git"`)
+    et `gitdialog.js` (`view: "git-dialog"`) font la partie Git façon lazygit.
+    Règles pures : `outils.js` (outils, terminal, largeur), `gitpanel.js`
+    (changements, branches, touches), `gitlog.js` + `lanes.js` (graphe repris de
+    herdr-git-graph, MIT). Ajouter un outil : une ligne dans `TOOLS` de
+    `outils.js`, un nœud sous `outils` dans `layouts/antoine.json`, une vue.
   - Herdr refuse qu'un mod importe un fichier d'un autre mod : tout ce qui
     partage du code reste dans `antoine`.
 - `~/.config/herdr-app/mods/antoine-spaces/` et `antoine-agents/` : copies
