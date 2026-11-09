@@ -14,7 +14,7 @@ const run = (cwd, args) => { const r = spawnSync("git", args, { cwd, env, encodi
 const sh = (cwd, ...args) => { const r = run(cwd, args); assert.equal(r.code, 0, r.stderr); return r.stdout; };
 const newRepo = () => { const d = realpathSync(mkdtempSync(join(tmpdir(), "outils-panel-"))); sh(d, "init", "-q", "-b", "main"); return d; };
 const changes = (d) => P.parseChanges(sh(d, ...P.STATUS_ARGS));
-const branches = (d) => P.parseBranches(sh(d, ...P.BRANCH_ARGS), sh(d, ...P.WORKTREE_ARGS), d);
+const branches = (d) => P.parseBranches(sh(d, ...P.BRANCH_ARGS), sh(d, ...P.WORKTREE_ARGS), d, (run(d, P.REFLOG_ARGS).stdout ?? "")); // sans commit, git reflog échoue : la vue passe ""
 
 test("changements : état et indexation", () => {
   const d = newRepo();
@@ -70,7 +70,8 @@ test("branches : actuelle et worktree", () => {
   const wt = d + "-wt";
   sh(d, "worktree", "add", "-q", "-b", "wt", wt);
   const b = branches(d);
-  assert.deepEqual(b.map((x) => x.name), ["dev", "main", "wt"]);
+  assert.deepEqual(b.map((x) => x.name).sort(), ["dev", "main", "wt"]);
+  assert.equal(b[0].name, "main");
   assert.equal(b.find((x) => x.name === "main").current, true);
   assert.equal(b.find((x) => x.name === "main").worktree, null);
   assert.equal(b.find((x) => x.name === "wt").worktree, wt);
@@ -168,4 +169,53 @@ test("lectures en série : une erreur n'empêche pas la suivante", async () => {
   await read(1).catch(() => {});
   await read(2);
   assert.deepEqual(runs, [1, 2]);
+});
+
+test("branches : ordre de lazygit, date du dernier passage, état distant", () => {
+  const remote = realpathSync(mkdtempSync(join(tmpdir(), "outils-remote-")));
+  sh(remote, "init", "-q", "--bare", "-b", "main");
+  const d = newRepo();
+  writeFileSync(join(d, "a.txt"), "a"); sh(d, "add", "."); sh(d, "commit", "-qm", "init");
+  sh(d, "remote", "add", "origin", remote);
+  sh(d, "push", "-q", "-u", "origin", "main");
+  sh(d, "branch", "vieille");
+  sh(d, "checkout", "-qb", "dev");
+  sh(d, "push", "-q", "-u", "origin", "dev");
+  writeFileSync(join(d, "b.txt"), "b"); sh(d, "add", "."); sh(d, "commit", "-qm", "b");
+  sh(d, "checkout", "-q", "main");
+  const b = branches(d);
+  assert.deepEqual(b.map((x) => x.name), ["main", "dev", "vieille"]);
+  assert.equal(b[0].current, true);
+  assert.equal(typeof b[1].checkedOut, "number");
+  assert.equal(b[2].checkedOut, null);
+  assert.equal(b[0].sync, "✓");
+  assert.equal(b[1].sync, "↑1");
+  assert.equal(b[2].sync, "");
+});
+
+test("état distant, comme lazygit", () => {
+  assert.equal(P.syncText("", ""), "");
+  assert.equal(P.syncText("origin/main", ""), "✓");
+  assert.equal(P.syncText("origin/main", "ahead 2"), "↑2");
+  assert.equal(P.syncText("origin/main", "behind 3"), "↓3");
+  assert.equal(P.syncText("origin/main", "ahead 2, behind 3"), "↑2↓3");
+  assert.equal(P.syncText("origin/x", "gone"), "?");
+});
+
+test("date courte de la liste des branches", () => {
+  const now = 1_800_000_000;
+  assert.equal(P.shortAgo(now - 30, now), "30s");
+  assert.equal(P.shortAgo(now - 5 * 60, now), "5m");
+  assert.equal(P.shortAgo(now - 3 * 3600, now), "3h");
+  assert.equal(P.shortAgo(now - 2 * 86400, now), "2d");
+  assert.equal(P.shortAgo(now - 15 * 86400, now), "2w");
+  assert.equal(P.shortAgo(now - 70 * 86400, now), "2M");
+  assert.equal(P.shortAgo(now - 800 * 86400, now), "2y");
+  assert.equal(P.shortAgo(null, now), "");
+});
+
+test("la branche qu'on quitte compte aussi comme visitée (lazygit)", () => {
+  const m = P.parseCheckouts("HEAD@{200}\0checkout: moving from main to dev\nHEAD@{100}\0checkout: moving from dev to main\n");
+  assert.equal(m.get("dev"), 200);
+  assert.equal(m.get("main"), 200);
 });
