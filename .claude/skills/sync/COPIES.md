@@ -119,6 +119,9 @@ Tout le reste suit `monokai`.
   - `mods/antoine/lanes.js` ← `mods/git-graph/lanes.js` (copie identique) ;
   - `mods/antoine/gitlog.js` ← `mods/git-graph/git.js`, de `READ` à `labelsOf`
     (sans `parseStatus`), libellé « Changements non validés (n) » en français ;
+- **Hors Herdr — Lucide** (https://lucide.dev, licence ISC, `lucide-static` 0.460.0) :
+  `mods/antoine/outils.svg` (wrench), `view-list.svg` (list), `view-tree.svg` (list-tree),
+  copies identiques avec leur ligne de licence.
   - dessin du graphe de `mods/antoine/gitview.js` sur le modèle de
     `mods/git-graph/graph.js` (lignes en `paint_path`, `ROW 24`, `LANE 12`, couleurs ansi).
 
