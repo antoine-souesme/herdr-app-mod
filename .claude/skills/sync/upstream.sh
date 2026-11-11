@@ -15,7 +15,8 @@ ORIGINALS=(mods/agents mods/spaces mods/tabs layouts/main.json themes/monokai.js
 
 case "${1:-}" in
   snapshot)
-    rm -rf "$SNAP"; mkdir -p "$SNAP/mods" "$SNAP/layouts"
+    # Only Herdr's originals are replaced: upstream/herdr-git-graph is kept by hand.
+    rm -rf "$SNAP/mods" "$SNAP/layouts" "$SNAP/themes" "$SNAP/VERSION"; mkdir -p "$SNAP/mods" "$SNAP/layouts"
     for o in "${ORIGINALS[@]}"; do mkdir -p "$(dirname "$SNAP/$o")"; cp -R "$HOME_DIR/$o" "$SNAP/$o"; done
     # Type declarations are refreshed by Herdr in every mod: not worth comparing.
     find "$SNAP" -name '*.d.ts' -delete

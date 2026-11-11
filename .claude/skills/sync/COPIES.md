@@ -76,6 +76,9 @@ Ajouts d'Antoine :
 - Plus de `export default class … extends View` : `export class TabBar` avec
   `constructor(_props, cx)`.
 - Icônes de fenêtre Windows lues dans `mods/antoine/win-*.svg` (copies identiques).
+- **Défilement vers l'onglet actif** (Herdr 0.1.15) : la place de l'onglet actif dans
+  la rangée (séparateur, visionneurs et fichier affiché compris) vient de `scrollIndex`
+  de `files.js` ; `selected` est le chemin du fichier affiché ou l'id de l'onglet.
 - **Bouton « Outils »** (`mods/antoine/outils.svg`) après Files et Changes, toujours
   affiché ; panneau ouvert et choisi par `selectPanel`, qui donne à Outils sa propre
   largeur (`panelWidth` de `outils.js`, retenue dans `localStorage` `panelWidths`) ;

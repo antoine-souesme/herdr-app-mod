@@ -207,3 +207,17 @@ test("fileLabels: le nom seul, et les dossiers quand deux fichiers ont le même 
   assert.equal(two.get("/p/one/index.js"), "index.js — one");
   assert.equal(two.get("/p/two/index.js"), "index.js — two");
 });
+
+test("scrollIndex : place de l'onglet actif dans la barre (séparateur compris)", () => {
+  // Pas de visionneur ni de fichier : pas de séparateur.
+  assert.equal(F.scrollIndex({ terms: 3, images: 0, active: 2, files: [], file: null }), 2);
+  // Un terminal actif avant le séparateur garde sa place.
+  assert.equal(F.scrollIndex({ terms: 3, images: 1, active: 1, files: ["/a"], file: null }), 1);
+  // Un visionneur d'image actif vient après le séparateur.
+  assert.equal(F.scrollIndex({ terms: 3, images: 1, active: 3, files: [], file: null }), 4);
+  // Un fichier affiché : après les terminaux, le séparateur et les visionneurs.
+  assert.equal(F.scrollIndex({ terms: 2, images: 1, active: 0, files: ["/a", "/b"], file: "/b" }), 5);
+  // Rien d'actif.
+  assert.equal(F.scrollIndex({ terms: 2, images: 0, active: -1, files: [], file: null }), -1);
+  assert.equal(F.scrollIndex({ terms: 2, images: 0, active: 0, files: ["/a"], file: "/z" }), -1);
+});
